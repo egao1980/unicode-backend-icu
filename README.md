@@ -1,24 +1,19 @@
 # unicode-backend-icu
 
-[`unicode-protocol`](https://github.com/egao1980/unicode-protocol) backend over **ICU4C** (planned).
+[`unicode-protocol`](https://github.com/egao1980/unicode-protocol) backend over **ICU4C** via [`cl-stack-icu`](https://github.com/egao1980/cl-stack-icu).
 
-**Not for consumers yet.** This checkout is a scaffold only: CFFI bindings and ICU4C native overlays are **TODO**.
+## Capabilities
 
-## Planned shape
-
-| Piece | Role |
-|-------|------|
-| `unicode-backend-icu` | CLOS backend class + `use-icu-backend` |
-| ICU4C overlays | Platform `libicuuc` / `libicui18n` / `libicuio` via [cl-repository](https://github.com/egao1980/cl-repository) (`linux` / `darwin` / `windows`) |
-| grovel-at-build | CFFI definitions generated at build time against overlay headers |
-
-Protocol `backend-*` generic functions are intentionally unimplemented here; callers get `no-applicable-method` until bindings land. Capability checks use `unicode-unsupported` once methods exist.
-
-Tracks [cl-stack#151](https://github.com/egao1980/cl-stack/issues/151).
+`:properties` `:normalize` `:nfkc-casefold` `:casefold` `:idna` `:script` `:emoji`
+`:char-name` `:breaks` `:uset`
 
 ```lisp
-(asdf:load-system "unicode-backend-icu")
-(unicode-backend-icu:use-icu-backend)
+(asdf:load-system "unicode-backend-icu")  ; installs *unicode-backend*
+(normalize "café" :form :nfc)
+(unicode-name #\A)                        ; "LATIN CAPITAL LETTER A"
+(idna-name-to-ascii "bücher.de")
+(make-unicode-set :pattern "[:Letter:]")
+(make-break-iterator :grapheme)
 ```
 
 ## License

@@ -1,10 +1,10 @@
+;;;; Smoke + capability registry.
+
 (in-package #:unicode-backend-icu/tests)
 
-(deftest system-loads
-  (ok (asdf:find-system "unicode-backend-icu")))
-
-(deftest use-icu-backend-installs
-  (let ((backend (use-icu-backend)))
-    (ok (typep backend 'icu-backend))
-    (ok (eq *unicode-backend* backend))
-    (ok (null (backend-capabilities backend)))))
+(deftest backend-installed
+  (ok (typep *unicode-backend* 'icu-backend))
+  (dolist (cap '(:properties :normalize :nfkc-casefold :casefold :idna
+                 :script :emoji :char-name :breaks :uset))
+    (ok (member cap (backend-capabilities *unicode-backend*))
+        (format nil "capability ~s" cap))))
