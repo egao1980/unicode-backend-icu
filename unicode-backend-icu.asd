@@ -1,13 +1,18 @@
 (defsystem "unicode-backend-icu"
   :version "0.1.0"
-  :description "unicode-protocol backend over ICU4C (scaffold — bindings TODO)"
+  :description "unicode-protocol backend over cl-stack-icu (ICU4C)"
   :author "egao1980"
   :license "MIT"
-  :depends-on ("unicode-protocol" "cffi")
+  :depends-on ("unicode-protocol" "cl-stack-icu" "cffi")
   :serial t
   :pathname "src"
   :components ((:file "package")
-               (:file "backend"))
+               (:file "util")
+               (:file "backend")
+               (:file "properties")
+               (:file "normalize")
+               (:file "case")
+               (:file "idna"))
   :in-order-to ((test-op (test-op "unicode-backend-icu/tests"))))
 
 (defsystem "unicode-backend-icu/tests"
