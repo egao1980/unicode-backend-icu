@@ -22,7 +22,13 @@
   :pathname "tests"
   :serial t
   :components ((:file "package")
-               (:file "backend-test"))
+               (:file "backend-test")
+               (:file "properties-test")
+               (:file "normalize-test")
+               (:file "case-test")
+               (:file "idna-test")
+               (:file "break-test")
+               (:file "uset-test"))
   :perform (test-op (o c)
              (unless (symbol-call :rove :run c)
                (error "tests failed for ~A" (component-name c)))))
