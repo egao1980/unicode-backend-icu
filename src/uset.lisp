@@ -1,7 +1,7 @@
 (in-package #:unicode-backend-icu)
 
 (defun %uset-ptr (set)
-  (unicode-protocol::uset-raw set))
+  (uset-raw set))
 
 (defun %span-condition (contained)
   (cffi:foreign-enum-value 'cl-stack-icu:u-set-span-condition

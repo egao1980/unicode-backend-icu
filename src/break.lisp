@@ -11,13 +11,13 @@
                              (:sentence :sentence))))
 
 (defun %break-bi (iterator)
-  (getf (unicode-protocol::break-raw iterator) :bi))
+  (getf (break-raw iterator) :bi))
 
 (defun %break-free-buf (iterator)
-  (let ((buf (getf (unicode-protocol::break-raw iterator) :buf)))
+  (let ((buf (getf (break-raw iterator) :buf)))
     (when (and buf (not (cffi:null-pointer-p buf)))
       (cffi:foreign-free buf)
-      (setf (getf (unicode-protocol::break-raw iterator) :buf) nil))))
+      (setf (getf (break-raw iterator) :buf) nil))))
 
 (defmethod backend-make-break-iterator ((backend icu-backend) kind &key locale)
   (declare (ignore backend))
@@ -46,7 +46,7 @@
         (setf (cffi:mem-ref err :int) (%zero-error))
         (cl-stack-icu:u-str-from-utf8 buf (1+ n) needed utf8 -1 err)
         (cl-stack-icu:check-icu (cffi:mem-ref err :int) "u-str-from-utf8")
-        (setf (getf (unicode-protocol::break-raw iterator) :buf) buf)
+        (setf (getf (break-raw iterator) :buf) buf)
         (setf (cffi:mem-ref err :int) (%zero-error))
         (cl-stack-icu:ubrk-set-text (%break-bi iterator) buf
                                     (cffi:mem-ref needed :int32) err)
