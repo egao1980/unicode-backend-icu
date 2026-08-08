@@ -6,7 +6,8 @@
 (defvar *icu-backend* nil)
 
 (defmethod backend-capabilities ((backend icu-backend))
-  '(:properties :normalize :nfkc-casefold :casefold :idna :script :emoji))
+  '(:properties :normalize :nfkc-casefold :casefold :idna :script :emoji
+    :char-name :breaks :uset))
 
 (defun use-icu-backend (&optional (backend (or *icu-backend*
                                               (setf *icu-backend*

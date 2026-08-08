@@ -3,7 +3,10 @@
 (deftest backend-installed
   (ok (typep *unicode-backend* 'icu-backend))
   (ok (member :idna (backend-capabilities *unicode-backend*)))
-  (ok (member :normalize (backend-capabilities *unicode-backend*))))
+  (ok (member :normalize (backend-capabilities *unicode-backend*)))
+  (ok (member :char-name (backend-capabilities *unicode-backend*)))
+  (ok (member :breaks (backend-capabilities *unicode-backend*)))
+  (ok (member :uset (backend-capabilities *unicode-backend*))))
 
 (deftest general-category-and-normalize
   (ok (eq (general-category #\A) :lu))
@@ -26,3 +29,27 @@
   (ok (alphabetic-p #\A))
   (ok (not (alphabetic-p #\1)))
   (ok (emoji-p (code-char #x1F600))))
+
+(deftest char-name-a
+  (ok (search "LATIN CAPITAL LETTER A" (unicode-name #\A)))
+  (ok (= (lookup-name "LATIN CAPITAL LETTER A") #x0041)))
+
+(deftest numeric-and-age
+  (ok (= (numeric-value #\5) 5d0))
+  (ok (equal (age #\A) '(1 1 0 0))))
+
+(deftest uset-letter
+  (let ((s (make-unicode-set :pattern "[:Letter:]")))
+    (ok (uset-contains-p s #\A))
+    (ok (not (uset-contains-p s #\0)))
+    (ok (plusp (uset-size s)))))
+
+(deftest break-grapheme-ab
+  (let ((it (make-break-iterator :grapheme)))
+    (break-set-text it "ab")
+    (ok (= (break-first it) 0))
+    (ok (= (break-next it) 1))
+    (ok (break-is-boundary-p it 1))))
+
+(deftest quick-check-nfc
+  (ok (eq (quick-check "a" :form :nfc) :yes)))

@@ -3,7 +3,7 @@
   :description "unicode-protocol backend over cl-stack-icu (ICU4C)"
   :author "egao1980"
   :license "MIT"
-  :depends-on ("unicode-protocol" "cl-stack-icu" "cffi")
+  :depends-on ("unicode-protocol" "cl-stack-icu" "cffi" "trivial-garbage")
   :serial t
   :pathname "src"
   :components ((:file "package")
@@ -12,7 +12,9 @@
                (:file "properties")
                (:file "normalize")
                (:file "case")
-               (:file "idna"))
+               (:file "idna")
+               (:file "break")
+               (:file "uset"))
   :in-order-to ((test-op (test-op "unicode-backend-icu/tests"))))
 
 (defsystem "unicode-backend-icu/tests"
