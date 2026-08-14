@@ -50,4 +50,8 @@
   ;; Long PropertyValueAliases → keywords (:latin, :cyrillic, …)
   (ok (eq (script #\A) :latin))
   (ok (eq (script (code-char #x0410)) :cyrillic)) ; А
-  (ok (member :latin (script-extensions #\A))))
+  (ok (member :latin (script-extensions #\A)))
+  ;; U+30FC has Script_Extensions {Hira, Kana}
+  (let ((ext (script-extensions (code-char #x30FC))))
+    (ok (member :hiragana ext))
+    (ok (member :katakana ext))))

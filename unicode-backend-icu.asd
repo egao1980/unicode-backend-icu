@@ -1,5 +1,5 @@
 (defsystem "unicode-backend-icu"
-  :version "0.1.0"
+  :version "0.1.1"
   :description "unicode-protocol backend over cl-stack-icu (ICU4C)"
   :author "egao1980"
   :license "MIT"
