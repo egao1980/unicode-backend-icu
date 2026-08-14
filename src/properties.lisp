@@ -41,8 +41,22 @@
       (otherwise v))))
 
 (defmethod backend-script-extensions ((backend icu-backend) code-point)
-  ;; Full Script_Extensions needs uscript_getScriptExtensions; single Script covers most cps.
-  (list (backend-int-property backend code-point :script)))
+  (declare (ignore backend))
+  (cffi:with-foreign-objects ((err :int) (scripts :int32 16))
+    (setf (cffi:mem-ref err :int) (%zero-error))
+    (let ((n (cl-stack-icu:uscript-get-script-extensions code-point scripts 16 err)))
+      (when (= (cffi:mem-ref err :int)
+               (cffi:foreign-enum-value 'cl-stack-icu:u-error-code :buffer-overflow-error))
+        (setf (cffi:mem-ref err :int) (%zero-error))
+        (cffi:with-foreign-object (scripts2 :int32 (max n 1))
+          (setf n (cl-stack-icu:uscript-get-script-extensions code-point scripts2 n err))
+          (cl-stack-icu:check-icu (cffi:mem-ref err :int) "uscript-get-script-extensions")
+          (return-from backend-script-extensions
+            (loop for i below n
+                  collect (%property-value-keyword :script (cffi:mem-aref scripts2 :int32 i))))))
+      (cl-stack-icu:check-icu (cffi:mem-ref err :int) "uscript-get-script-extensions")
+      (loop for i below n
+            collect (%property-value-keyword :script (cffi:mem-aref scripts :int32 i))))))
 
 (defmethod backend-char-name ((backend icu-backend) code-point &key (choice :unicode))
   (declare (ignore backend))

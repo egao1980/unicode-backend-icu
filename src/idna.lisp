@@ -11,7 +11,13 @@
   (reserved-i3 :int32))
 
 (defun %uidna-convert (name options direction)
-  (let ((opts (%uidna-options options)))
+  "DIRECTION is :name-ascii | :name-unicode | :label-ascii | :label-unicode."
+  (let ((opts (%uidna-options options))
+        (fn (ecase direction
+              (:name-ascii #'cl-stack-icu:uidna-name-to-ascii)
+              (:name-unicode #'cl-stack-icu:uidna-name-to-unicode)
+              (:label-ascii #'cl-stack-icu:uidna-label-to-ascii)
+              (:label-unicode #'cl-stack-icu:uidna-label-to-unicode))))
     (cffi:with-foreign-object (err :int)
       (setf (cffi:mem-ref err :int) (%zero-error))
       (let ((idna (cl-stack-icu:uidna-open-uts46 opts err)))
@@ -28,10 +34,7 @@
                         0)
                   (setf (cffi:foreign-slot-value info '(:struct uidna-info) 'errors) 0)
                   (setf (cffi:mem-ref err :int) (%zero-error))
-                  (let* ((cap (max 64 (* src-len 4)))
-                         (fn (ecase direction
-                               (:ascii #'cl-stack-icu:uidna-name-to-ascii)
-                               (:unicode #'cl-stack-icu:uidna-name-to-unicode))))
+                  (let ((cap (max 64 (* src-len 4))))
                     (flet ((run (dest capacity)
                              (setf (cffi:foreign-slot-value info '(:struct uidna-info) 'errors) 0)
                              (setf (cffi:mem-ref err :int) (%zero-error))
@@ -63,18 +66,23 @@
 
 (defmethod backend-idna-name-to-ascii ((backend icu-backend) name &key options)
   (declare (ignore backend))
-  (%uidna-convert name options :ascii))
+  (%uidna-convert name options :name-ascii))
 
 (defmethod backend-idna-name-to-unicode ((backend icu-backend) name &key options)
   (declare (ignore backend))
-  (%uidna-convert name options :unicode))
+  (%uidna-convert name options :name-unicode))
 
 (defmethod backend-idna-label-to-ascii ((backend icu-backend) label &key options)
-  (backend-idna-name-to-ascii backend label :options options))
+  (declare (ignore backend))
+  (%uidna-convert label options :label-ascii))
 
 (defmethod backend-idna-label-to-unicode ((backend icu-backend) label &key options)
-  (backend-idna-name-to-unicode backend label :options options))
+  (declare (ignore backend))
+  (%uidna-convert label options :label-unicode))
 
 (defmethod backend-idna-map ((backend icu-backend) string &key std3 transitional)
-  (declare (ignore std3 transitional))
-  (backend-idna-name-to-unicode backend string :options '()))
+  "UTS #46 via ICU UIDNA (nameToUnicode applies map+normalize; honors STD3/transitional)."
+  (let ((opts '()))
+    (when std3 (push :std3 opts))
+    (when transitional (push :transitional opts))
+    (backend-idna-name-to-unicode backend string :options opts)))

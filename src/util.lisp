@@ -4,8 +4,11 @@
   (cffi:foreign-enum-value 'cl-stack-icu:u-error-code :zero-error))
 
 (defun %optionp (options key)
+  "True when OPTIONS (keyword list and/or plist) enables KEY."
   (or (find key options :test #'eq)
-      (getf options key)))
+      (and (listp options)
+           (evenp (length options))
+           (getf options key))))
 
 ;;; ICU UCharCategory → Unicode General_Category short keywords (:lu …).
 (defparameter *gc-short*
